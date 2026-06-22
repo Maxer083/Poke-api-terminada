@@ -1,0 +1,15 @@
+{
+  "name": "tarea-ajax-universal",
+  "version": "1.0.0",
+  "description": "Validación automática para fetch y XMLHttpRequest",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "whatwg-fetch": "^3.6.20",
+    "xmlhttprequest": "^1.8.0"
+  }
+}

@@ -1,0 +1,22 @@
+name: Correccion Automatica de AJAX
+
+on: [push] # Se ejecuta automáticamente cada vez que el alumno sube código
+
+jobs:
+  evaluar-tarea:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Descargar el código del alumno
+      uses: actions/checkout@v4
+
+    - name: Instalar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-node-version: '20'
+
+    - name: Instalar dependencias de testing
+      run: npm install
+
+    - name: Ejecutar los Tests Universales
+      run: npm test
