@@ -1,0 +1,564 @@
+/* ==========================================================================
+   IMPORTACIÓN DE FUENTE PIXELADA RETRO 8-BITS
+   ========================================================================== */
+/* Carga la fuente oficial estilo arcade desde los servidores de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #dc0a2d; /* Rojo base que cubre los bordes si algo falla */
+    font-family: 'Press Start 2P', monospace; /* Aplica la fuente pixelada a toda la web */
+    overflow: hidden; /* Evita scrolls dobles molestos en el navegador manteniendo fija la app */
+}
+
+/* ==========================================================================
+   LA CASA DE LA POKÉDEX: Contenedor Principal (PANTALLA COMPLETA TOTAL)
+   ========================================================================== */
+.pokedex-container {
+    position: relative; /* Base de posicionamiento para elementos internos absolutos */
+    width: 100%; 
+    height: 100vh;     /* Fuerza a la Pokédex a ocupar exactamente el alto de la pantalla */
+    margin: 0;
+    /* Degradado lineal que simula el reflejo de la luz sobre el plástico rojo de la consola */
+    background: linear-gradient(135deg, #dc0a2d 0%, #a80721 100%);
+    border: 12px solid #222; /* Borde ultra grueso negro clásico de caricaturas/manga */
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.5); /* Sombra interna para dar profundidad tridimensional */
+    display: flex; /* Distribuye los paneles izquierdo y derecho en formato horizontal */
+    padding: 25px;
+    gap: 20px; /* Separación fija entre el panel izquierdo y el derecho */
+    box-sizing: border-box; /* Asegura que los bordes y paddings no deformen el tamaño total */
+}
+
+/* ==========================================================================
+   LADO IZQUIERDO: Escenario del Pokémon
+   ========================================================================== */
+.screen-left {
+    width: 50%; /* Ocupa exactamente la mitad del ancho de la Pokédex */
+    height: 100%; /* Sigue el alto completo de la Pokédex */
+    background-color: #c8e8f8; /* Color de fondo cian claro (tipo pantalla LCD retro) */
+    /* El siguiente bloque genera un cuadriculado sutil de fondo emulando la matriz de píxeles antigua */
+    background-image: linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 16px 16px; /* Define el tamaño de cada "píxel" o cuadrícula de fondo */
+    border: 5px solid #222;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column; /* Organiza los elementos internos (título, sprite, botones) verticalmente */
+    justify-content: space-between; /* Empuja el título arriba, el sprite al centro y los botones abajo */
+    align-items: center;
+    padding: 16px; 
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.4); /* Sombra interna para hundir la pantalla LCD */
+}
+
+/* BOTÓN DE SONIDO FLOTANTE */
+.btn-music-floating {
+    position: fixed; /* Lo independiza del flujo para ubicarlo con coordenadas exactas */
+    bottom: 25px;        
+    right: 25px;      
+    z-index: 5;        /* Lo coloca por encima de la Pokéball giratoria de fondo */
+    width: 42px;
+    height: 42px;
+    background-color: #f0f0f0;
+    border: 3px solid #222;
+    border-radius: 50%; /* Transforma el botón cuadrado en un círculo perfecto */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 0px #111; /* Sombra sólida inferior que simula un botón con relieve real */
+    transition: transform 0.05s ease; /* Suaviza el efecto de presión */
+}
+
+/* Icono del parlante/sonido dentro del botón */
+.btn-music-floating img {
+    width: 20px;
+    height: 20px;
+    image-rendering: pixelated; /* Evita que el icono se vea borroso al renderizarse */
+}
+
+/* Estados e interacciones del botón de sonido */
+.btn-music-floating:hover:not(:disabled) { background-color: #fff; }
+/* Efecto físico de hundimiento al hacer click */
+.btn-music-floating:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0px #111; }
+/* Estilos visuales opacos para cuando el Pokémon no tiene audio cargado */
+.btn-music-floating:disabled {
+    background-color: #7fa3b5;
+    border-color: #4a5f6b;
+    opacity: 0.4;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+/* CAJA DE TÍTULO */
+.pokemon-title-box {
+    background-color: #3a637c; /* Azul acero oscuro tipo interfaz de juego clásico */
+    color: white;
+    width: 100%;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 14px; 
+    font-weight: bold;
+    text-transform: uppercase; /* Asegura que el nombre siempre grite en mayúsculas */
+    border-radius: 6px;
+    border: 3px solid #222;
+    /* Las siguientes 3 propiedades evitan que nombres largos rompan el diseño, añadiendo puntos suspensivos (...) */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 4px 0px rgba(0,0,0,0.15);
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+/* PANTALLA CENTRAL DEL SPRITE */
+.sprite-display-zone {
+    flex: 1; /* Le permite estirarse y ocupar todo el espacio disponible en el centro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    position: relative; 
+    overflow: hidden;
+    min-height: 240px;
+}
+
+/* MARCA DE AGUA: Pokéball giratoria de fondo en la pantalla izquierda */
+.sprite-display-zone::before {
+    content: ""; /* Obligatorio para activar pseudoelementos */
+    position: absolute;
+    width: 100%;
+    max-width: 420px;  
+    height: 100%;
+    max-height: 420px;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/53/Pok%C3%A9_Ball_icon.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    /* Filtro CSS complejo para transformar la Pokéball negra de Wikipedia en color azul translúcido */
+    filter: invert(39%) sepia(34%) saturate(836%) hue-rotate(163deg) brightness(91%) contrast(88%);
+    opacity: 0.15; /* Lo vuelve muy sutil para que no tape al Pokémon */
+    z-index: 0;   
+    animation: rotarPoke 20s linear infinite; /* Dispara la animación de rotación continua */
+}
+
+/* Animación de rotación infinita para la Pokéball de fondo */
+@keyframes rotarPoke {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* CONFIGURACIÓN DEL SPRITE DEL POKÉMON */
+.pokemon-sprite {
+    width: 100%;
+    max-width: 220px;          
+    height: auto;          
+    object-fit: contain;    
+    /* ¡EL TRUCO MÁS IMPORTANTE!: Desactiva el suavizado del navegador para que las imágenes */
+    /* de la API conserven sus bordes pixelados limpios y nítidos como en una consola real */
+    image-rendering: pixelated; 
+    z-index: 1; /* Se posiciona por encima de la Pokéball giratoria */
+}
+
+/* CONTENEDOR DE TIPOS */
+.pokemon-types-box {
+    display: flex;
+    gap: 12px;       
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 12px;  
+    z-index: 2;
+}
+
+/* Estilo general para las etiquetas de tipo */
+.type-badge {
+    font-size: 11px;          
+    padding: 10px 0;          
+    flex: 1; /* Hace que ambas medallas midan exactamente lo mismo si hay dos tipos */
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+    border-radius: 6px;      
+    border: 3px solid rgba(0, 0, 0, 0.3); /* Borde oscuro semi-translúcido */
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.5); /* Sombra de texto dura estilo retro */
+    font-weight: bold;
+    box-shadow: 0 4px 0px rgba(0,0,0,0.15);
+}
+
+/* PALETA DE TIPOS OFICIALES (Asigna colores según la clase que inyecte JavaScript) */
+.type-normal { background-color: #A8A878; }
+.type-fire { background-color: #F08030; }
+.type-water { background-color: #6890F0; }
+.type-grass { background-color: #78C850; }
+/* Electric e Ice usan texto oscuro sin sombra para mejorar la legibilidad sobre fondos claros */
+.type-electric { background-color: #F8D030; color: #111; text-shadow: none; }
+.type-ice { background-color: #98D8D8; color: #111; text-shadow: none; }
+.type-fighting { background-color: #C03028; }
+.type-poison { background-color: #A040A0; }
+.type-ground { background-color: #E0C068; }
+.type-flying { background-color: #A890F0; }
+.type-psychic { background-color: #F85888; }
+.type-bug { background-color: #A8B820; }
+.type-rock { background-color: #B8A038; }
+.type-ghost { background-color: #705898; }
+.type-dragon { background-color: #7038F8; }
+.type-dark { background-color: #705848; }
+.type-steel { background-color: #B8B8D0; }
+.type-fairy { background-color: #EE99AC; }
+
+/* BOTONES DE ACCIÓN RETRO (Fila inferior del panel izquierdo) */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    z-index: 2;
+}
+
+/* Esqueleto común para los botones Info, Shiny y Formas */
+.btn-retro {
+    color: white;
+    border: 3px solid #222;
+    padding: 12px 2px; 
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px; 
+    cursor: pointer;
+    text-transform: uppercase;
+    border-radius: 6px;
+    font-weight: bold;
+    flex: 1; /* Distribuye equitativamente el ancho del contenedor entre los tres */
+    text-align: center;
+}
+
+/* Botón INFO (Azul oscuro) */
+.btn-info { background-color: #254458; box-shadow: 0 4px 0 #11202a; }
+.btn-info:hover { background-color: #3a637c; }
+.btn-info:active { transform: translateY(3px); box-shadow: none; }
+
+/* Botón SHINY (Naranja/Dorado) */
+.btn-shiny { background-color: #a06600; box-shadow: 0 4px 0 #503300; }
+.btn-shiny:hover { background-color: #cc8400; }
+.btn-shiny:active { transform: translateY(3px); box-shadow: none; }
+/* Clase especial activa: Se mantiene presionada visualmente cuando el modo shiny está prendido */
+.btn-shiny.active { background-color: #e6b800; color: #111; box-shadow: inset 0 2px 5px rgba(0,0,0,0.4); transform: translateY(1px); }
+
+/* Botón FORMAS (Verde militar) */
+.btn-shapes { background-color: #2d632d; box-shadow: 0 4px 0 #163316; }
+.btn-shapes:hover { background-color: #448844; }
+.btn-shapes:active { transform: translateY(3px); box-shadow: none; }
+/* Bloqueo visual si el Pokémon actual no posee formas alternativas */
+.btn-shapes:disabled { background-color: #556355; opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+
+/* Botón Música (Gris) */
+.btn-cry { background-color: #00ad82; box-shadow: 0 4px 0 #00533f; }
+.btn-cry:hover { background-color: #004736; }
+.btn-cry:active { transform: translateY(3px); box-shadow: none; }
+/* Bloqueo visual si el Pokémon actual no posee formas alternativas */
+.btn-cry:disabled { background-color: #ccc; opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+
+/* ==========================================================================
+   LADO DERECHO: Lista de selección y buscador
+   ========================================================================== */
+.screen-right {
+    width: 50%; /* Ocupa la otra mitad simétrica de la interfaz */
+    height: 100%; /* Toma el alto completo de la pantalla */
+    display: flex;
+    flex-direction: column; /* Buscador arriba, lista abajo */
+    box-sizing: border-box;
+    background-color: #d8f0f8; /* Tono de pantalla cian un poco diferente */
+    border: 5px solid #222;
+    border-radius: 12px;
+    overflow: hidden; /* Corta cualquier elemento desbordado para proteger los bordes redondos */
+    box-shadow: inset 0 0 25px rgba(0,0,0,0.2);
+}
+
+/* Contenedor del campo de texto de búsqueda */
+.search-container {
+    padding: 12px;
+    background-color: #b0d8e8;
+    border-bottom: 4px solid #222; /* Línea divisoria física */
+    flex-shrink: 0; /* Bloquea al buscador para que la lista interna no lo aplaste */
+}
+
+/* El cuadro de input de texto */
+.search-input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 3px solid #222;
+    border-radius: 6px;
+    background-color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    outline: none; /* Quita el resplandor azul por defecto de los navegadores modernos */
+    color: #222;
+}
+
+/* LISTA DE POKÉMONES CON DESLIZADOR */
+.pokemon-list-scroll {
+    flex: 1; /* Toma todo el espacio inferior restante */
+    overflow-y: auto; /* Activa la barra de desplazamiento vertical cuando se satura de Pokémon */
+}
+
+/* Estilos personalizados para la barra de scroll (Estilo retro sutil) */
+.pokemon-list-scroll::-webkit-scrollbar { width: 10px; }
+.pokemon-list-scroll::-webkit-scrollbar-track { background: #b0d8e8; }
+.pokemon-list-scroll::-webkit-scrollbar-thumb { background: #3a637c; border-radius: 4px; border: 2px solid #222; }
+
+/* Filas individuales de la lista derecha */
+.pokemon-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 12px; 
+    font-size: 11px; 
+    color: #222;
+    cursor: pointer;
+    border-bottom: 2px dashed rgba(58, 99, 124, 0.2); /* Separador punteado */
+    text-transform: capitalize; /* Convierte la primera letra del nombre en mayúscula */
+}
+
+.pokemon-item:hover { background-color: #bce0f0; }
+/* Fila activa: Indica cuál es el Pokémon seleccionado en el visor izquierdo */
+.pokemon-item.active { background-color: #fff; color: #000; font-weight: bold; border-left: 8px solid #3a637c; }
+.pokeball-icon { width: 16px; height: 16px; margin-right: 10px; }
+
+/* ==========================================================================
+   MODALES DE INFORMACIÓN
+   ========================================================================== */
+.info-modal {
+    position: absolute; /* Se acopla encima del panel izquierdo de forma exacta */
+    top: 25px;
+    left: 25px;
+    width: calc(50% - 25px); /* Calcula el tamaño restando los desfases de los paddings */
+    height: calc(100% - 50px);
+    background-color: rgba(200, 232, 248, 0.98); /* Fondo cian opaco casi total */
+    display: none; /* Oculto inicialmente */
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: 8px;
+    border: 5px solid #222;
+    transform: translateY(115%); /* Lo posiciona abajo oculto para la animación de subida */
+    transition: transform 0.25s ease-in-out; /* Efecto suave de cortina/persiana */
+    z-index: 100; /* Prioridad de dibujo absoluta */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Clase inyectada por JS que activa la vista del modal en pantalla */
+.info-modal.open { 
+    display: flex; 
+    transform: translateY(0); /* Sube el modal a su posición visible */
+}
+
+.modal-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 4px solid #222; 
+    padding-bottom: 10px; 
+    margin-bottom: 12px; 
+    flex-shrink: 0;
+}
+
+.modal-title { font-weight: bold; text-transform: uppercase; font-size: 11px; color: #111; }
+
+/* Botón de salida (X) del modal */
+.btn-close-modal {
+    background: #cc4444; color: white; border: 3px solid #222;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px; font-weight: bold; cursor: pointer;
+    padding: 6px 10px; border-radius: 4px;
+    box-shadow: 0 3px 0 #732222;
+}
+.btn-close-modal:active { transform: translateY(2px); box-shadow: none; }
+
+/* Contenedor del reporte técnico de estadísticas internas */
+.modal-body { 
+    font-size: 11px; 
+    color: #222; 
+    overflow-y: auto; /* Permite scroll general dentro del modal si los datos exceden la altura */
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    line-height: 1.5; 
+    flex: 1;
+    padding-right: 4px; 
+}
+
+/* Scroll interno fino para el cuerpo del modal */
+.modal-body::-webkit-scrollbar { width: 6px; }
+.modal-body::-webkit-scrollbar-track { background: transparent; }
+.modal-body::-webkit-scrollbar-thumb { background: #3a637c; border-radius: 3px; }
+
+/* Filas de características (Peso, altura, stats base) */
+.info-row { display: flex; justify-content: space-between; border-bottom: 2px dotted #222; padding: 4px 0; flex-shrink: 0; }
+.info-label { font-weight: bold; color: #254458; }
+
+/* Botones para elegir variantes (Alola, Galar, Megas) dentro del modal de formas */
+.shape-option-item {
+    background-color: #fff;
+    padding: 12px 8px;
+    border: 3px solid #222;
+    border-radius: 6px;
+    cursor: pointer;
+    text-transform: capitalize;
+    font-size: 10px;
+    font-weight: bold;
+    color: #222;
+    text-align: center;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+}
+.shape-option-item:hover { background-color: #3a637c; color: white; }
+.shape-option-item:active { transform: translateY(2px); box-shadow: none; }
+
+/* CUADRADO BLANCO DINÁMICO: Diseñado para albergar la descripción de la Pokédex */
+.pokedex-description-box {
+    background-color: #fff;
+    border: 3px solid #222;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 10px;
+    line-height: 1.6;
+    color: #111;
+    height: auto;              /* Crece automáticamente con el texto */
+    overflow: visible;         /* No oculta ni corta las letras sobrantes */
+    text-transform: uppercase; 
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.15);
+    flex-shrink: 0;            /* Evita que otros elementos lo colapsen */
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   SISTEMA DE CADENA EVOLUTIVA
+   ========================================================================== */
+/* Recuadro contenedor del árbol de evolución */
+#evolutionChainBox {
+    display: flex;
+    flex-direction: row;     /* Coloca las etapas evolutivas una al lado de la otra */
+    align-items: center;     
+    justify-content: center; 
+    gap: 10px;
+    width: 100%;      
+    max-width: 100%;          
+    margin: 15px 0;       
+    padding: 12px;
+    background: #fff;
+    border: 3px solid #222;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* Nodo de conexión */
+.evolution-node {
+    display: flex;
+    flex-direction: row;     
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mini-tarjeta individual de cada integrante de la cadena */
+.pkm-evolution-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90px;             
+    box-sizing: border-box;
+    transition: transform 0.2s;
+    text-align: center;
+}
+
+/* Ajusta los mini sprites evolutivos */
+.pkm-evolution-card img {
+    max-width: 100%;
+    height: auto;
+    image-rendering: pixelated; /* Píxeles nítidos en las evoluciones */
+}
+
+.pkm-evolution-card:hover {
+    transform: scale(1.05); /* Pequeño brinco visual al pasar el mouse */
+}
+
+/* Caja contenedora de la flecha indicadora y el nivel/método */
+.evolution-arrow-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;          /* Texto de requerimiento ultra pequeño */
+    min-width: 65px;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0 5px;           
+}
+
+.evolution-arrow {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 4px;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES: ADAPTABILIDAD MÓVIL
+   ========================================================================== */
+/* Se activa cuando la pantalla mide 768px de ancho o menos (Celulares y Tablets) */
+@media (max-width: 768px) {
+    html, body { 
+        overflow-y: auto; /* Permite scroll en toda la web para poder bajar a ver el segundo panel */
+        overflow-x: hidden;
+        height: auto;
+    }
+    
+    /* Cambia la Pokédex de formato libro abierto (horizontal) a torre (vertical) */
+    .pokedex-container {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+        border: 6px solid #222; 
+    }
+
+    /* El panel izquierdo toma el 100% del ancho del celular */
+    .screen-left {
+        width: 100%; 
+        height: auto;
+        position: relative; 
+        margin-bottom: 10px;
+    }
+
+    /* El panel derecho se sitúa abajo ocupando el 70% del alto de la pantalla del celular */
+    .screen-right {
+        width: 100%; 
+        height: 70vh; 
+    }
+
+    /* Reconfigura el modal para que no flote en el aire, sino que tape toda la pantalla del celu */
+    .info-modal {
+        position: fixed; 
+        top: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        height: calc(100% - 20px);
+    }
+
+    /* El árbol evolutivo pasa de horizontal a vertical en móviles para que no se corte por los costados */
+    #evolutionChainBox {
+        flex-direction: column;  
+        gap: 15px;
+    }
+
+    .evolution-node {
+        flex-direction: column;  
+    }
+
+    .evolution-arrow-box {
+        margin: 10px 0;          
+    }
+
+    /* Rota la flecha horizontal (➔) 90 grados para convertirla en una flecha hacia abajo (▼) */
+    .evolution-arrow {
+        transform: rotate(90deg); 
+    }
+}

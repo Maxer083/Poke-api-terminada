@@ -1,11 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Pokédex Virtual</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="img/Poké_Ball_icon.png" type="image/x-icon">
 </head>
 <body>
-    
+
+    <div class="pokedex-container" id="pokedexWrapper">
+        
+        <div class="screen-left">
+            
+            <button id="btnMusicToggle" class="btn-music-floating" title="Activar musica">
+                <img src="img/volume-mute.png" alt="Musica pausada">
+            </button>
+
+            <div class="pokemon-title-box" id="pokeName">Cargando...</div>
+            
+            <div class="sprite-display-zone">
+                <img src="" alt="" class="pokemon-sprite" id="pokeSprite">
+            </div>
+            
+            <div class="pokemon-types-box" id="pokeTypes"></div>
+
+            <div class="action-buttons">
+                <button class="btn-retro btn-info" id="btnInfo">Info</button>
+                <button class="btn-retro btn-shapes" id="btnShapes" disabled>Forms</button>
+                <button class="btn-retro btn-shiny" id="btnShiny">★ Shiny</button>
+                <button class="btn-retro btn-cry" id="btnCry">Cry</button>
+            </div>
+        </div>
+        
+        <div class="screen-right">
+            <div class="search-container">
+                <input type="text" id="pokeSearch" class="search-input" placeholder="Buscar...">
+            </div>
+            <div class="pokemon-list-scroll" id="pokemonList"></div>
+        </div>
+
+        <div class="info-modal" id="infoModal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalPokeName">Detalles</span>
+                <button class="btn-close-modal" id="btnCloseModal">X</button>
+            </div>
+            <div class="modal-body" id="modalPokeBody"></div>
+        </div>
+
+        <div class="info-modal" id="shapesModal">
+            <div class="modal-header">
+                <span class="modal-title">Forms</span>
+                <button class="btn-close-modal" id="btnCloseShapesModal">X</button>
+            </div>
+            <div class="modal-body" id="modalShapesBody"></div>
+        </div>
+        
+    </div>
+
+    <script src="main.js"></script>
+
 </body>
 </html>
